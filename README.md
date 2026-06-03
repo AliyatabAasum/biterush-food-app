@@ -32,9 +32,13 @@ A modern, full-stack food ordering web application built with **React + Vite**, 
 ## 🖥️ Screenshots
 
 ### Home Page — Menu Browsing
-![BiteRush Home](https://live-link-request-meqq.bolt.host)
+<img width="1889" height="779" alt="Screenshot 2026-06-04 020726" src="https://github.com/user-attachments/assets/526551d5-33af-419a-b490-0e9265daf9f0" />
 
-> *Browse hundreds of dishes with ratings, prices, and category filters*
+<img width="1852" height="859" alt="Screenshot 2026-06-04 020918" src="https://github.com/user-attachments/assets/48422ce1-ba93-47dd-8e36-21d73e374fd9" />
+
+<img width="1843" height="866" alt="Screenshot 2026-06-04 020947" src="https://github.com/user-attachments/assets/b2fc3f2e-ff49-4707-9c2c-b9d6340374f3" />
+
+
 
 ### Menu Categories
 | Category | Items Available |
