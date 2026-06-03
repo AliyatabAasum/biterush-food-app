@@ -1,0 +1,540 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0f0f0f;color:#f0f0f0;min-height:100vh}
+:root{--orange:#FF6B2C;--orange-light:#FF8C5A;--dark:#0f0f0f;--card:#1a1a1a;--card2:#222;--border:#2a2a2a;--muted:#888;--green:#2ECC71;--red:#E74C3C}
+.app{display:flex;flex-direction:column;min-height:100vh}
+nav{background:#141414;border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.logo{font-size:22px;font-weight:800;color:var(--orange);letter-spacing:-0.5px}
+.logo span{color:#fff}
+.nav-links{display:flex;gap:4px}
+.nav-btn{background:none;border:none;color:var(--muted);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:14px;transition:all .2s;display:flex;align-items:center;gap:6px}
+.nav-btn:hover,.nav-btn.active{background:rgba(255,107,44,0.12);color:var(--orange)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.cart-btn{background:var(--orange);border:none;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;transition:all .2s}
+.cart-btn:hover{background:var(--orange-light)}
+.badge{background:#fff;color:var(--orange);border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.page{display:none;padding:24px;max-width:1100px;margin:0 auto;width:100%}
+.page.active{display:block}
+h1{font-size:28px;font-weight:800;margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:24px}
+.search-bar{display:flex;gap:12px;margin-bottom:24px}
+.search-bar input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 16px;color:#fff;font-size:14px;outline:none}
+.search-bar input:focus{border-color:var(--orange)}
+.filter-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.filter-chip{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 16px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s}
+.filter-chip:hover,.filter-chip.active{background:rgba(255,107,44,0.15);border-color:var(--orange);color:var(--orange)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.food-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .2s;cursor:pointer}
+.food-card:hover{border-color:var(--orange);transform:translateY(-2px)}
+.food-img{height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
+.food-badge{position:absolute;top:10px;right:10px;background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.food-body{padding:14px}
+.food-name{font-size:16px;font-weight:700;margin-bottom:4px}
+.food-desc{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.food-footer{display:flex;align-items:center;justify-content:space-between}
+.food-price{font-size:18px;font-weight:800;color:var(--orange)}
+.add-btn{background:var(--orange);border:none;color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.add-btn:hover{background:var(--orange-light);transform:scale(1.1)}
+.rating{display:flex;align-items:center;gap:4px;font-size:12px;color:#F1C40F;margin-bottom:8px}
+.rating span{color:var(--muted)}
+.wishlist-btn{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.wishlist-btn.active{color:#E74C3C}
+.wishlist-btn:hover{transform:scale(1.1)}
+.cart-layout{display:grid;grid-template-columns:1fr 340px;gap:24px}
+.cart-items{display:flex;flex-direction:column;gap:12px}
+.cart-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:14px}
+.cart-item-emoji{font-size:40px;width:56px;text-align:center}
+.cart-item-info{flex:1}
+.cart-item-name{font-weight:600;font-size:15px;margin-bottom:4px}
+.cart-item-price{color:var(--orange);font-weight:700}
+.qty-ctrl{display:flex;align-items:center;gap:8px;margin-top:8px}
+.qty-btn{background:var(--card2);border:1px solid var(--border);color:#fff;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.qty-btn:hover{border-color:var(--orange);color:var(--orange)}
+.qty-num{font-weight:700;font-size:15px;min-width:24px;text-align:center}
+.del-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:4px}
+.order-summary{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;height:fit-content;position:sticky;top:80px}
+.order-summary h3{font-size:18px;font-weight:700;margin-bottom:16px}
+.sum-row{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;color:var(--muted)}
+.sum-row.total{color:#fff;font-weight:700;font-size:16px;border-top:1px solid var(--border);margin-top:8px;padding-top:12px}
+.promo-input{display:flex;gap:8px;margin:14px 0}
+.promo-input input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;outline:none}
+.promo-input button{background:var(--orange);border:none;color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.checkout-btn{background:var(--orange);border:none;color:#fff;width:100%;padding:14px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:14px;transition:all .2s}
+.checkout-btn:hover{background:var(--orange-light)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .emoji{font-size:64px;margin-bottom:16px}
+.empty-state h3{font-size:20px;color:#fff;margin-bottom:8px}
+.orders-list{display:flex;flex-direction:column;gap:14px}
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.order-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.order-id{font-weight:700;font-size:15px}
+.order-status{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.status-delivered{background:rgba(46,204,113,0.15);color:var(--green)}
+.status-preparing{background:rgba(255,107,44,0.15);color:var(--orange)}
+.status-cancelled{background:rgba(231,76,60,0.15);color:var(--red)}
+.order-items-text{font-size:13px;color:var(--muted);margin-bottom:10px}
+.order-footer{display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.order-total{font-weight:700;color:var(--orange)}
+.reorder-btn{background:none;border:1px solid var(--orange);color:var(--orange);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+.reorder-btn:hover{background:var(--orange);color:#fff}
+.admin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.stat-icon{font-size:28px;margin-bottom:8px}
+.stat-val{font-size:26px;font-weight:800;margin-bottom:4px}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-change{font-size:12px;color:var(--green);margin-top:4px}
+.admin-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.admin-section h3{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.add-item-btn{background:var(--orange);border:none;color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.pill-green{background:rgba(46,204,113,0.15);color:var(--green)}
+.pill-orange{background:rgba(255,107,44,0.15);color:var(--orange)}
+.pill-red{background:rgba(231,76,60,0.15);color:var(--red)}
+.action-btns{display:flex;gap:6px}
+.edit-btn,.dlt-btn{background:none;border:1px solid var(--border);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s}
+.edit-btn{color:var(--orange);border-color:var(--orange)}
+.dlt-btn{color:var(--red);border-color:var(--red)}
+.edit-btn:hover{background:rgba(255,107,44,0.1)}
+.dlt-btn:hover{background:rgba(231,76,60,0.1)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#1a1a1a;border:1px solid var(--border);border-radius:16px;padding:28px;width:480px;max-width:90vw;max-height:90vh;overflow-y:auto}
+.modal h2{font-size:20px;font-weight:700;margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;transition:border .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--orange)}
+.form-group textarea{height:80px;resize:none}
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+.modal-footer{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.btn-secondary{background:none;border:1px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:8px;cursor:pointer;font-size:14px}
+.btn-primary{background:var(--orange);border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+.toast{position:fixed;bottom:24px;right:24px;background:#222;border:1px solid var(--orange);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:300;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.wishlist-empty,.cart-empty{text-align:center;padding:60px;color:var(--muted)}
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+select option{background:#1a1a1a}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;background:var(--orange);border-radius:2px;transition:width .4s}
+</style>
+</head>
+<body>
+<div class="app">
+<nav>
+  <div class="logo">🍔 Bite<span>Rush</span></div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('menu',this)">🍽 Menu</button>
+    <button class="nav-btn" onclick="showPage('wishlist',this)">❤️ Wishlist</button>
+    <button class="nav-btn" onclick="showPage('orders',this)">📦 Orders</button>
+    <button class="nav-btn" onclick="showPage('admin',this)">⚙️ Admin</button>
+  </div>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="showPage('cart',document.querySelector('.nav-btn'))">
+      🛒 Cart <span class="badge" id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- MENU PAGE -->
+<div class="page active" id="page-menu" style="padding-top:28px">
+  <h1>What are you craving?</h1>
+  <p class="subtitle">Fresh, hot, and delivered to your door 🚀</p>
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Search dishes..." oninput="filterMenu()">
+  </div>
+  <div class="filter-row" id="filter-row"></div>
+  <div class="grid" id="menu-grid"></div>
+</div>
+
+<!-- CART PAGE -->
+<div class="page" id="page-cart">
+  <h1>Your Cart</h1>
+  <p class="subtitle" id="cart-subtitle">Review your items before checkout</p>
+  <div id="cart-content"></div>
+</div>
+
+<!-- WISHLIST PAGE -->
+<div class="page" id="page-wishlist">
+  <h1>Wishlist</h1>
+  <p class="subtitle">Items you've saved for later</p>
+  <div id="wishlist-content"></div>
+</div>
+
+<!-- ORDERS PAGE -->
+<div class="page" id="page-orders">
+  <h1>Your Orders</h1>
+  <p class="subtitle">Track and manage your past orders</p>
+  <div class="orders-list" id="orders-list"></div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+  <h1>Admin Dashboard</h1>
+  <p class="subtitle">Manage your food ordering platform</p>
+  <div class="admin-grid" id="admin-stats"></div>
+  <div class="admin-section">
+    <h3>Menu Items <button class="add-item-btn" onclick="openAddModal()">+ Add Item</button></h3>
+    <table>
+      <thead><tr><th>Item</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+      <tbody id="admin-table"></tbody>
+    </table>
+  </div>
+  <div class="admin-section">
+    <h3>Recent Orders</h3>
+    <table>
+      <thead><tr><th>Order ID</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody id="admin-orders-table"></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ADD ITEM MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <h2 id="modal-title">Add Menu Item</h2>
+    <div class="form-row">
+      <div class="form-group"><label>Item Name</label><input id="f-name" placeholder="e.g. Margherita Pizza"></div>
+      <div class="form-group"><label>Emoji</label><input id="f-emoji" placeholder="🍕" style="width:80px"></div>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="f-desc" placeholder="Short description..."></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Price ($)</label><input id="f-price" type="number" placeholder="9.99"></div>
+      <div class="form-group"><label>Category</label>
+        <select id="f-cat">
+          <option>Burgers</option><option>Pizza</option><option>Asian</option><option>Healthy</option><option>Drinks</option><option>Desserts</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Rating</label><input id="f-rating" type="number" min="1" max="5" step="0.1" placeholder="4.5"></div>
+      <div class="form-group"><label>Badge (optional)</label><input id="f-badge" placeholder="HOT / NEW / SALE"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let menuItems = [
+  {id:1,name:"Classic Smash Burger",emoji:"🍔",desc:"Double smashed patty, American cheese, special sauce, pickles",price:12.99,cat:"Burgers",rating:4.8,badge:"BESTSELLER"},
+  {id:2,name:"BBQ Bacon Bliss",emoji:"🥓",desc:"Crispy bacon, BBQ sauce, caramelized onions, cheddar",price:14.49,cat:"Burgers",rating:4.7,badge:null},
+  {id:3,name:"Margherita Pizza",emoji:"🍕",desc:"San Marzano tomato, fresh mozzarella, basil, EVOO",price:13.99,cat:"Pizza",rating:4.9,badge:"POPULAR"},
+  {id:4,name:"Pepperoni Inferno",emoji:"🌶️",desc:"Double pepperoni, spicy marinara, ghost pepper drizzle",price:15.99,cat:"Pizza",rating:4.6,badge:"HOT"},
+  {id:5,name:"Pad Thai",emoji:"🍜",desc:"Rice noodles, shrimp, egg, bean sprouts, peanuts, lime",price:11.99,cat:"Asian",rating:4.7,badge:null},
+  {id:6,name:"Spicy Ramen",emoji:"🍱",desc:"Tonkotsu broth, chashu pork, soft egg, nori, scallions",price:13.49,cat:"Asian",rating:4.8,badge:"NEW"},
+  {id:7,name:"Acai Power Bowl",emoji:"🥗",desc:"Acai blend, granola, banana, strawberry, honey drizzle",price:10.99,cat:"Healthy",rating:4.5,badge:null},
+  {id:8,name:"Avocado Toast",emoji:"🥑",desc:"Sourdough, smashed avocado, poached egg, red pepper flakes",price:9.99,cat:"Healthy",rating:4.4,badge:null},
+  {id:9,name:"Mango Lassi",emoji:"🥭",desc:"Fresh mango, yogurt, milk, rose water, cardamom",price:5.99,cat:"Drinks",rating:4.9,badge:"POPULAR"},
+  {id:10,name:"Chocolate Lava Cake",emoji:"🍫",desc:"Warm molten chocolate center, vanilla ice cream",price:7.99,cat:"Desserts",rating:4.8,badge:"NEW"},
+  {id:11,name:"Churros & Dip",emoji:"🍩",desc:"Crispy churros with dulce de leche & chocolate sauce",price:6.99,cat:"Desserts",rating:4.6,badge:null},
+  {id:12,name:"Iced Matcha Latte",emoji:"🍵",desc:"Ceremonial grade matcha, oat milk, vanilla syrup",price:5.49,cat:"Drinks",rating:4.7,badge:null},
+];
+let cart = {};
+let wishlist = new Set();
+let orders = [
+  {id:"#ORD-1024",items:"Smash Burger × 2, Mango Lassi × 1",total:31.97,status:"Delivered",date:"May 28, 2025"},
+  {id:"#ORD-1023",items:"Margherita Pizza × 1, Lava Cake × 2",total:29.97,status:"Delivered",date:"May 25, 2025"},
+  {id:"#ORD-1022",items:"Pad Thai × 2, Iced Matcha × 1",total:29.47,status:"Cancelled",date:"May 20, 2025"},
+  {id:"#ORD-1021",items:"Spicy Ramen × 1, Acai Bowl × 1",total:24.48,status:"Preparing",date:"Jun 04, 2025"},
+];
+let activeFilter = "All";
+let nextId = 13;
+let editingId = null;
+
+const categories = ["All","Burgers","Pizza","Asian","Healthy","Drinks","Desserts"];
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function showPage(name, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn && btn.classList) btn.classList.add('active');
+  if(name==='cart') renderCart();
+  if(name==='wishlist') renderWishlist();
+  if(name==='orders') renderOrders();
+  if(name==='admin') renderAdmin();
+}
+
+function getCartCount(){return Object.values(cart).reduce((a,b)=>a+b,0)}
+function getCartTotal(){return Object.entries(cart).reduce((a,[id,qty])=>{const it=menuItems.find(x=>x.id==id);return a+(it?it.price*qty:0);},0)}
+
+function updateCartBadge(){document.getElementById('cart-count').textContent=getCartCount()}
+
+function addToCart(id){
+  cart[id]=(cart[id]||0)+1;
+  updateCartBadge();
+  const item = menuItems.find(x=>x.id==id);
+  showToast(`✅ ${item.name} added to cart!`);
+}
+
+function removeFromCart(id){if(cart[id]>1)cart[id]--;else delete cart[id];renderCart();updateCartBadge()}
+function incCart(id){cart[id]=(cart[id]||0)+1;renderCart();updateCartBadge()}
+
+function toggleWishlist(id){
+  const item = menuItems.find(x=>x.id==id);
+  if(wishlist.has(id)){wishlist.delete(id);showToast(`💔 Removed from wishlist`);}
+  else{wishlist.add(id);showToast(`❤️ ${item.name} saved to wishlist!`);}
+  renderMenu();
+}
+
+function filterMenu(){renderMenu()}
+
+function renderMenu(){
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = menuItems.filter(it=>{
+    const matchCat = activeFilter==="All"||it.cat===activeFilter;
+    const matchQ = it.name.toLowerCase().includes(q)||it.desc.toLowerCase().includes(q)||it.cat.toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+  const grid = document.getElementById('menu-grid');
+  if(!filtered.length){grid.innerHTML=`<div style="color:var(--muted);padding:40px;grid-column:1/-1;text-align:center">No items found 🍽️</div>`;return;}
+  grid.innerHTML = filtered.map(it=>`
+    <div class="food-card">
+      <div class="food-img" style="background:linear-gradient(135deg,#1e1e1e,#2a2a2a)">
+        ${it.emoji}
+        ${it.badge?`<span class="food-badge">${it.badge}</span>`:''}
+        <button class="wishlist-btn ${wishlist.has(it.id)?'active':''}" onclick="toggleWishlist(${it.id})">
+          ${wishlist.has(it.id)?'❤️':'🤍'}
+        </button>
+      </div>
+      <div class="food-body">
+        <div class="rating">${'⭐'.repeat(Math.floor(it.rating))} <span>${it.rating} (${Math.floor(Math.random()*200+50)})</span></div>
+        <div class="food-name">${it.name}</div>
+        <div class="food-desc">${it.desc}</div>
+        <div class="food-footer">
+          <span class="food-price">$${it.price.toFixed(2)}</span>
+          <button class="add-btn" onclick="addToCart(${it.id})" title="Add to cart">+</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderFilters(){
+  const row = document.getElementById('filter-row');
+  row.innerHTML = categories.map(c=>`
+    <button class="filter-chip ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}</button>
+  `).join('');
+}
+
+function setFilter(cat){activeFilter=cat;renderFilters();renderMenu()}
+
+function renderCart(){
+  const keys = Object.keys(cart);
+  const content = document.getElementById('cart-content');
+  if(!keys.length){
+    content.innerHTML=`<div class="cart-empty"><div class="emoji">🛒</div><h3>Your cart is empty</h3><p>Add some delicious items from the menu!</p><button class="checkout-btn" style="max-width:200px;margin:20px auto 0" onclick="showPage('menu',document.querySelectorAll('.nav-btn')[0])">Browse Menu</button></div>`;
+    return;
+  }
+  const subtotal = getCartTotal();
+  const delivery = 2.99;
+  const tax = subtotal*0.08;
+  const total = subtotal+delivery+tax;
+  const promoDiscount = sessionStorage.getItem('promo')?subtotal*0.1:0;
+  const finalTotal = total - promoDiscount;
+  content.innerHTML = `
+    <div class="cart-layout">
+      <div class="cart-items">
+        ${keys.map(id=>{
+          const it=menuItems.find(x=>x.id==id);if(!it)return'';
+          return `<div class="cart-item">
+            <div class="cart-item-emoji">${it.emoji}</div>
+            <div class="cart-item-info">
+              <div class="cart-item-name">${it.name}</div>
+              <div class="cart-item-price">$${(it.price*cart[id]).toFixed(2)}</div>
+              <div class="qty-ctrl">
+                <button class="qty-btn" onclick="removeFromCart(${it.id})">−</button>
+                <span class="qty-num">${cart[id]}</span>
+                <button class="qty-btn" onclick="incCart(${it.id})">+</button>
+              </div>
+            </div>
+            <button class="del-btn" onclick="delete cart[${it.id}];renderCart();updateCartBadge()">🗑</button>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="sum-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+        <div class="sum-row"><span>Delivery fee</span><span>$${delivery.toFixed(2)}</span></div>
+        <div class="sum-row"><span>Tax (8%)</span><span>$${tax.toFixed(2)}</span></div>
+        ${promoDiscount?`<div class="sum-row" style="color:var(--green)"><span>Promo (BITE10)</span><span>-$${promoDiscount.toFixed(2)}</span></div>`:''}
+        <div class="sum-row total"><span>Total</span><span>$${finalTotal.toFixed(2)}</span></div>
+        <div class="promo-input">
+          <input id="promo-code" placeholder="Promo code (try BITE10)">
+          <button onclick="applyPromo()">Apply</button>
+        </div>
+        <button class="checkout-btn" onclick="placeOrder()">Place Order 🚀</button>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px">🔒 Secure checkout • Free returns</p>
+      </div>
+    </div>`;
+}
+
+function applyPromo(){
+  const code = document.getElementById('promo-code').value.trim().toUpperCase();
+  if(code==='BITE10'){sessionStorage.setItem('promo','1');showToast('🎉 10% discount applied!');renderCart();}
+  else showToast('❌ Invalid promo code');
+}
+
+function placeOrder(){
+  if(!Object.keys(cart).length)return;
+  const items = Object.entries(cart).map(([id,qty])=>{
+    const it=menuItems.find(x=>x.id==id);
+    return `${it.name} × ${qty}`;
+  }).join(', ');
+  const total = getCartTotal()+2.99+getCartTotal()*0.08;
+  const newOrder = {
+    id:`#ORD-${1025+orders.filter(o=>o.status==='Preparing').length}`,
+    items,total:parseFloat(total.toFixed(2)),status:'Preparing',date:'Jun 04, 2025'
+  };
+  orders.unshift(newOrder);
+  cart={};
+  sessionStorage.removeItem('promo');
+  updateCartBadge();
+  showToast('🎉 Order placed successfully!');
+  showPage('orders',document.querySelectorAll('.nav-btn')[2]);
+}
+
+function renderWishlist(){
+  const content = document.getElementById('wishlist-content');
+  if(!wishlist.size){content.innerHTML=`<div class="wishlist-empty"><div style="font-size:64px">❤️</div><h3 style="color:#fff;margin-top:16px">No saved items</h3><p>Heart items on the menu to save them here</p></div>`;return;}
+  const items = menuItems.filter(x=>wishlist.has(x.id));
+  content.innerHTML=`<div class="wish-grid">${items.map(it=>`
+    <div class="food-card">
+      <div class="food-img" style="background:linear-gradient(135deg,#1e1e1e,#2a2a2a)">${it.emoji}
+        <button class="wishlist-btn active" onclick="toggleWishlist(${it.id});renderWishlist()">❤️</button>
+      </div>
+      <div class="food-body">
+        <div class="food-name">${it.name}</div>
+        <div class="food-desc">${it.desc}</div>
+        <div class="food-footer">
+          <span class="food-price">$${it.price.toFixed(2)}</span>
+          <button class="add-btn" onclick="addToCart(${it.id})">+</button>
+        </div>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function renderOrders(){
+  document.getElementById('orders-list').innerHTML = orders.map(o=>`
+    <div class="order-card">
+      <div class="order-header">
+        <span class="order-id">${o.id}</span>
+        <span class="order-status status-${o.status.toLowerCase()}">${o.status}</span>
+      </div>
+      <div class="order-items-text">${o.items}</div>
+      ${o.status==='Preparing'?`<div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div><p style="font-size:12px;color:var(--orange);margin-top:6px">🍳 Kitchen is preparing your order...</p>`:''}
+      <div class="order-footer" style="margin-top:10px">
+        <span style="color:var(--muted);font-size:13px">${o.date}</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="order-total">$${o.total.toFixed(2)}</span>
+          <button class="reorder-btn" onclick="showToast('🛒 Items added to cart!')">Reorder</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderAdmin(){
+  const stats = [
+    {icon:'💰',val:'$4,827',label:'Total Revenue',change:'+12% this month'},
+    {icon:'📦',val:orders.length,label:'Total Orders',change:'+3 today'},
+    {icon:'🍽️',val:menuItems.length,label:'Menu Items',change:'Active catalog'},
+    {icon:'⭐',val:'4.7',label:'Avg Rating',change:'Based on 847 reviews'},
+  ];
+  document.getElementById('admin-stats').innerHTML = stats.map(s=>`
+    <div class="stat-card">
+      <div class="stat-icon">${s.icon}</div>
+      <div class="stat-val">${s.val}</div>
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-change">${s.change}</div>
+    </div>`).join('');
+
+  document.getElementById('admin-table').innerHTML = menuItems.map(it=>`
+    <tr>
+      <td>${it.emoji} ${it.name}</td>
+      <td><span class="pill pill-orange">${it.cat}</span></td>
+      <td>$${it.price.toFixed(2)}</td>
+      <td><span class="pill pill-green">In Stock</span></td>
+      <td><div class="action-btns">
+        <button class="edit-btn" onclick="openEditModal(${it.id})">Edit</button>
+        <button class="dlt-btn" onclick="deleteItem(${it.id})">Delete</button>
+      </div></td>
+    </tr>`).join('');
+
+  document.getElementById('admin-orders-table').innerHTML = orders.map(o=>`
+    <tr>
+      <td>${o.id}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items}</td>
+      <td>$${o.total.toFixed(2)}</td>
+      <td><span class="pill ${o.status==='Delivered'?'pill-green':o.status==='Preparing'?'pill-orange':'pill-red'}">${o.status}</span></td>
+      <td style="color:var(--muted);font-size:12px">${o.date}</td>
+    </tr>`).join('');
+}
+
+function openAddModal(){editingId=null;document.getElementById('modal-title').textContent='Add Menu Item';document.getElementById('f-name').value='';document.getElementById('f-emoji').value='';document.getElementById('f-desc').value='';document.getElementById('f-price').value='';document.getElementById('f-rating').value='';document.getElementById('f-badge').value='';document.getElementById('add-modal').classList.add('open')}
+function openEditModal(id){
+  editingId=id;
+  const it=menuItems.find(x=>x.id==id);
+  document.getElementById('modal-title').textContent='Edit Menu Item';
+  document.getElementById('f-name').value=it.name;
+  document.getElementById('f-emoji').value=it.emoji;
+  document.getElementById('f-desc').value=it.desc;
+  document.getElementById('f-price').value=it.price;
+  document.getElementById('f-cat').value=it.cat;
+  document.getElementById('f-rating').value=it.rating;
+  document.getElementById('f-badge').value=it.badge||'';
+  document.getElementById('add-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('add-modal').classList.remove('open')}
+function saveItem(){
+  const name=document.getElementById('f-name').value.trim();
+  const emoji=document.getElementById('f-emoji').value.trim()||'🍽️';
+  const desc=document.getElementById('f-desc').value.trim();
+  const price=parseFloat(document.getElementById('f-price').value);
+  const cat=document.getElementById('f-cat').value;
+  const rating=parseFloat(document.getElementById('f-rating').value)||4.5;
+  const badge=document.getElementById('f-badge').value.trim()||null;
+  if(!name||!price){showToast('⚠️ Name and price are required');return;}
+  if(editingId){
+    const idx=menuItems.findIndex(x=>x.id==editingId);
+    menuItems[idx]={...menuItems[idx],name,emoji,desc,price,cat,rating,badge};
+    showToast('✅ Item updated!');
+  } else {
+    menuItems.push({id:nextId++,name,emoji,desc,price,cat,rating,badge});
+    showToast('✅ Item added to menu!');
+  }
+  closeModal();renderMenu();renderAdmin();
+}
+function deleteItem(id){
+  if(!confirm('Delete this item?'))return;
+  menuItems=menuItems.filter(x=>x.id!=id);
+  delete cart[id];wishlist.delete(id);
+  updateCartBadge();renderAdmin();renderMenu();
+  showToast('🗑 Item deleted');
+}
+
+renderFilters();
+renderMenu();
+</script>
+</body>
+</html>
